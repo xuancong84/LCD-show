@@ -94,71 +94,71 @@ fi
 
 #setting LCD rotate
 if [ $output_type = "hdmi" ]; then
-if [ $new_rotate_value -eq 4 ]; then
-sudo sed -i -e ''"$line"'s/'"$str"'/display_rotate=0x10000/' /boot/config.txt
-elif  [ $new_rotate_value -eq 5 ]; then
-sudo sed -i -e ''"$line"'s/'"$str"'/display_rotate=0x20000/' /boot/config.txt
-else
-sudo sed -i -e ''"$line"'s/'"$str"'/display_rotate='"$new_rotate_value"'/' /boot/config.txt
-fi
-new_rotate_value=$[$new_rotate_value*90]
+	if [ $new_rotate_value -eq 4 ]; then
+	sudo sed -i -e ''"$line"'s/'"$str"'/display_rotate=0x10000/' /boot/config.txt
+	elif  [ $new_rotate_value -eq 5 ]; then
+	sudo sed -i -e ''"$line"'s/'"$str"'/display_rotate=0x20000/' /boot/config.txt
+	else
+	sudo sed -i -e ''"$line"'s/'"$str"'/display_rotate='"$new_rotate_value"'/' /boot/config.txt
+	fi
+	new_rotate_value=$[$new_rotate_value*90]
 elif [ $output_type = "gpio" ]; then
-sudo sed -i -e ''"$line"'s/'"$str"'/rotate='"$new_rotate_value"'/' /boot/config.txt
-resultr=`grep -rn "^hdmi_cvt" /boot/config.txt | tail -n 1 | awk -F' ' '{print $1,$2,$3}'`
-if [ -n "$resultr" ]; then
-liner=`echo -n $resultr | awk -F: '{printf $1}'`
-strr=`echo -n $resultr | awk -F: '{printf $2}'`
-if [ $new_rotate_value -eq $default_value ] || [ $new_rotate_value -eq $[($default_value+180+360)%360] ]; then
-sudo sed -i -e ''"$liner"'s/'"$strr"'/hdmi_cvt '"$width"' '"$height"'/' /boot/config.txt
-elif [ $new_rotate_value -eq $[($default_value-90+360)%360] ] || [ $new_rotate_value -eq $[($default_value+90+360)%360] ]; then
-sudo sed -i -e ''"$liner"'s/'"$strr"'/hdmi_cvt '"$height"' '"$width"'/' /boot/config.txt
-fi
-fi
+	sudo sed -i -e ''"$line"'s/'"$str"'/rotate='"$new_rotate_value"'/' /boot/config.txt
+	resultr=`grep -rn "^hdmi_cvt" /boot/config.txt | tail -n 1 | awk -F' ' '{print $1,$2,$3}'`
+	if [ -n "$resultr" ]; then
+		liner=`echo -n $resultr | awk -F: '{printf $1}'`
+		strr=`echo -n $resultr | awk -F: '{printf $2}'`
+		if [ $new_rotate_value -eq $default_value ] || [ $new_rotate_value -eq $[($default_value+180+360)%360] ]; then
+		sudo sed -i -e ''"$liner"'s/'"$strr"'/hdmi_cvt '"$width"' '"$height"'/' /boot/config.txt
+		elif [ $new_rotate_value -eq $[($default_value-90+360)%360] ] || [ $new_rotate_value -eq $[($default_value+90+360)%360] ]; then
+		sudo sed -i -e ''"$liner"'s/'"$strr"'/hdmi_cvt '"$height"' '"$width"'/' /boot/config.txt
+		fi
+	fi
 fi
 
 #setting touch screen rotate
 if [ $touch_type = "resistance" ]; then 
-if [ $new_rotate_value -eq 0 ]; then
-sudo cp $cur_dir/usr/99-calibration.conf-$device_id-0 /etc/X11/xorg.conf.d/99-calibration.conf
-echo "LCD rotate value is set to $1"
-elif [ $new_rotate_value -eq 90 ]; then
-sudo cp $cur_dir/usr/99-calibration.conf-$device_id-90 /etc/X11/xorg.conf.d/99-calibration.conf
-echo "LCD rotate value is set to $1"
-elif [ $new_rotate_value -eq 180 ]; then
-sudo cp $cur_dir/usr/99-calibration.conf-$device_id-180 /etc/X11/xorg.conf.d/99-calibration.conf
-echo "LCD rotate value is set to $1"
-elif [ $new_rotate_value -eq 270 ]; then
-sudo cp $cur_dir/usr/99-calibration.conf-$device_id-270 /etc/X11/xorg.conf.d/99-calibration.conf
-echo "LCD rotate value is set to $1"
-elif [ $new_rotate_value -eq 360 ]; then
-sudo cp $cur_dir/usr/99-calibration.conf-$device_id-FLIP-H /etc/X11/xorg.conf.d/99-calibration.conf
-echo "LCD rotate value is set to flip horizontally"
-elif [ $new_rotate_value -eq 450 ]; then
-sudo cp $cur_dir/usr/99-calibration.conf-$device_id-FLIP-V /etc/X11/xorg.conf.d/99-calibration.conf
-echo "LCD rotate value is set to flip vertically"
-fi
+	if [ $new_rotate_value -eq 0 ]; then
+	sudo cp $cur_dir/usr/99-calibration.conf-$device_id-0 /etc/X11/xorg.conf.d/99-calibration.conf
+	echo "LCD rotate value is set to $1"
+	elif [ $new_rotate_value -eq 90 ]; then
+	sudo cp $cur_dir/usr/99-calibration.conf-$device_id-90 /etc/X11/xorg.conf.d/99-calibration.conf
+	echo "LCD rotate value is set to $1"
+	elif [ $new_rotate_value -eq 180 ]; then
+	sudo cp $cur_dir/usr/99-calibration.conf-$device_id-180 /etc/X11/xorg.conf.d/99-calibration.conf
+	echo "LCD rotate value is set to $1"
+	elif [ $new_rotate_value -eq 270 ]; then
+	sudo cp $cur_dir/usr/99-calibration.conf-$device_id-270 /etc/X11/xorg.conf.d/99-calibration.conf
+	echo "LCD rotate value is set to $1"
+	elif [ $new_rotate_value -eq 360 ]; then
+	sudo cp $cur_dir/usr/99-calibration.conf-$device_id-FLIP-H /etc/X11/xorg.conf.d/99-calibration.conf
+	echo "LCD rotate value is set to flip horizontally"
+	elif [ $new_rotate_value -eq 450 ]; then
+	sudo cp $cur_dir/usr/99-calibration.conf-$device_id-FLIP-V /etc/X11/xorg.conf.d/99-calibration.conf
+	echo "LCD rotate value is set to flip vertically"
+	fi
 elif [ $touch_type = "capacity" ]; then
-if [ $new_rotate_value -eq 0 ]; then
-sudo cp $cur_dir/usr/40-libinput.conf-0 /etc/X11/xorg.conf.d/40-libinput.conf
-echo "LCD rotate value is set to $1"
-elif [ $new_rotate_value -eq 90 ]; then
-sudo cp $cur_dir/usr/40-libinput.conf-90 /etc/X11/xorg.conf.d/40-libinput.conf
-echo "LCD rotate value is set to $1"
-elif [ $new_rotate_value -eq 180 ]; then
-sudo cp $cur_dir/usr/40-libinput.conf-180 /etc/X11/xorg.conf.d/40-libinput.conf
-echo "LCD rotate value is set to $1"
-elif [ $new_rotate_value -eq 270 ]; then
-sudo cp $cur_dir/usr/40-libinput.conf-270 /etc/X11/xorg.conf.d/40-libinput.conf
-echo "LCD rotate value is set to $1"
-elif [ $new_rotate_value -eq 360 ]; then
-sudo cp $cur_dir/usr/40-libinput.conf-FLIP-H /etc/X11/xorg.conf.d/40-libinput.conf
-echo "LCD rotate value is set to flip horizontally"
-elif [ $new_rotate_value -eq 450 ]; then
-sudo cp $cur_dir/usr/40-libinput.conf-FLIP-V /etc/X11/xorg.conf.d/40-libinput.conf
-echo "LCD rotate value is set to flip vertically"
-fi
+	if [ $new_rotate_value -eq 0 ]; then
+	sudo cp $cur_dir/usr/40-libinput.conf-0 /etc/X11/xorg.conf.d/40-libinput.conf
+	echo "LCD rotate value is set to $1"
+	elif [ $new_rotate_value -eq 90 ]; then
+	sudo cp $cur_dir/usr/40-libinput.conf-90 /etc/X11/xorg.conf.d/40-libinput.conf
+	echo "LCD rotate value is set to $1"
+	elif [ $new_rotate_value -eq 180 ]; then
+	sudo cp $cur_dir/usr/40-libinput.conf-180 /etc/X11/xorg.conf.d/40-libinput.conf
+	echo "LCD rotate value is set to $1"
+	elif [ $new_rotate_value -eq 270 ]; then
+	sudo cp $cur_dir/usr/40-libinput.conf-270 /etc/X11/xorg.conf.d/40-libinput.conf
+	echo "LCD rotate value is set to $1"
+	elif [ $new_rotate_value -eq 360 ]; then
+	sudo cp $cur_dir/usr/40-libinput.conf-FLIP-H /etc/X11/xorg.conf.d/40-libinput.conf
+	echo "LCD rotate value is set to flip horizontally"
+	elif [ $new_rotate_value -eq 450 ]; then
+	sudo cp $cur_dir/usr/40-libinput.conf-FLIP-V /etc/X11/xorg.conf.d/40-libinput.conf
+	echo "LCD rotate value is set to flip vertically"
+	fi
 else
-echo "Invalid touch type"
+	echo "Invalid touch type"
 exit
 fi
 

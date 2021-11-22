@@ -1,3 +1,10 @@
+### This is an improved version (only for MHS35-show) over the original LCD repo, especially for 64-bit Raspbian, PXE compatible
+Enhancements:
+1. system\_backup.sh no longer delete files/folders
+2. It does not make stupid assumptions on your /boot/config.txt and /boot/cmdline.txt, as well as whether your OS is 32-bit or 64-bit
+3. It is much smaller in size because it does not contain hard-copied .deb files, of which most are outdated
+4. It tries to go to highest resolution right away as low resolution is hardly useful
+
 ### Install drivers in the Ubuntu system
 https://github.com/lcdwiki/LCD-show-ubuntu
 
