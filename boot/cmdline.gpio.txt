@@ -1,0 +1,1 @@
+console=tty1 console=serial0,115200 elevator=deadline root=/dev/nfs nfsroot=192.168.50.2:/nfs/rootfs,vers=3 rw ip=dhcp rootwait fbcon=map:10 fbcon=font:ProFont6x11 logo.nologo

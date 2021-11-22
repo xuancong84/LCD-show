@@ -1,9 +1,10 @@
 #!/bin/bash
 
-sudo ./system_backup.sh
+./system_backup.sh
 
-sudo cp ./usr/mhs35-overlay.dtb /boot/overlays/
-sudo cp ./usr/mhs35-overlay.dtb /boot/overlays/mhs35.dtbo
+cp ./usr/mhs35-overlay.dtb /boot/overlays/
+cp ./usr/mhs35-overlay.dtb /boot/overlays/mhs35.dtbo
+cp boot/cmdline.*.txt boot/config.*.txt /boot/
 
 
 # Inject cmdline.txt
@@ -24,44 +25,51 @@ if [ ! -s /boot/config.txt ]; then
     echo "Error: /boot/config.txt not found, please mount your /boot folder!"
     exit 1
 fi
-for config in "dtparam=i2c_arm=on" "dtparam=spi=on" "enable_uart=1" "dtoverlay=mhs35:rotate=90" \
-	"hdmi_group=2" "hdmi_mode=82" "hdmi_drive=2"; do
+for config in "hdmi_force_hotplug=1" "dtparam=i2c_arm=on" "dtparam=spi=on" "enable_uart=1" "dtoverlay=mhs35:rotate=90" \
+	"hdmi_group=2" "hdmi_mode=85" "hdmi_drive=2"; do
 	if [ `grep "^$config" /boot/config.txt | wc -l` != 0 ]; then
 		continue
 	fi
 	if [ `grep "^#\+$config" /boot/config.txt | wc -l` != 0 ]; then
-		sudo sed -i "s/^#\+$config/$config/g" /boot/config.txt
+		sed -i "s/^#\+$config/$config/g" /boot/config.txt
 	fi
 done
+if [ `grep "^dtoverlay=vc4-kms-v3d" /boot/config.txt | wc -c` != 0 ]; then
+	sed -i "s:^dtoverlay=vc4-kms-v3d:dtoverlay=vc4-fkms-v3d:g" /boot/config.txt
+elif [ `grep "^#dtoverlay=vc4-kms-v3d" /boot/config.txt | wc -c` != 0 ]; then
+	sed -i "s:^#dtoverlay=vc4-kms-v3d:dtoverlay=vc4-kms-v3d:g" /boot/config.txt
+else
+	echo "dtoverlay=vc4-kms-v3d" >>/boot/config.txt
+fi
 
 
-sudo rm -rf /etc/X11/xorg.conf.d/40-libinput.conf
-sudo mkdir -p /etc/X11/xorg.conf.d
-sudo cp -rf ./usr/99-calibration.conf-mhs35-90  /etc/X11/xorg.conf.d/99-calibration.conf
-sudo cp -rf ./usr/99-fbturbo.conf  /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+rm -rf /etc/X11/xorg.conf.d/40-libinput.conf
+mkdir -p /etc/X11/xorg.conf.d
+cp -rf ./usr/99-calibration.conf-mhs35-90  /etc/X11/xorg.conf.d/99-calibration.conf
+cp -rf ./usr/99-fbturbo.conf  /usr/share/X11/xorg.conf.d/99-fbturbo.conf
 
-sudo cp ./usr/inittab /etc/
-sudo touch ./.have_installed
+cp ./usr/inittab /etc/
+touch ./.have_installed
 echo "gpio:resistance:mhs35:90:480:320" > ./.have_installed
 
 #FBCP install
 wget --spider -q -o /dev/null --tries=1 -T 10 https://github.com
 if [ $? -eq 0 ]; then
-	sudo cp -rf ./usr/99-fbturbo-fbcp.conf  /usr/share/X11/xorg.conf.d/99-fbturbo.conf
-	sudo apt-get install git cmake -y 2> error_output.txt
+	cp -rf ./usr/99-fbturbo-fbcp.conf  /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+	apt-get install git cmake -y 2> error_output.txt
 	result=`cat ./error_output.txt`
 	echo -e "\033[31m$result\033[0m"
 	grep -q "^E:" ./error_output.txt && exit
-	sudo rm -rf rpi-fbcp
-	sudo git clone https://github.com/tasanakorn/rpi-fbcp
-	sudo mkdir ./rpi-fbcp/build
+	rm -rf rpi-fbcp
+	git clone https://github.com/tasanakorn/rpi-fbcp
+	mkdir ./rpi-fbcp/build
 	cd ./rpi-fbcp/build/
-	sudo cmake ..
-	sudo make
-	sudo install fbcp /usr/local/bin/fbcp
-	if [ ! "`grep fbcp /etc/rc.local`" ]; then
+	cmake ..
+	make
+	install fbcp /usr/local/bin/fbcp
+	if [ ! "`grep '^[^#].*fbcp' /etc/rc.local`" ]; then
 		sed -i "/^exit 0/d" /etc/rc.local
-		echo 'sleep 7 && fbcp &' >>/etc/rc.local
+		echo 'sleep 7; fbcp &' >>/etc/rc.local
 		echo 'exit 0' >>/etc/rc.local
 	fi
 	cd - > /dev/null
@@ -79,25 +87,25 @@ if test $version -lt 2017;then
 	echo "reboot"
 else
 	echo "need to update touch configuration"
-	sudo apt-get install xserver-xorg-input-evdev  2> error_output.txt
+	apt-get install xserver-xorg-input-evdev  2> error_output.txt
 	result=`cat ./error_output.txt`
 	echo -e "\033[31m$result\033[0m"
 	grep -q "error:" ./error_output.txt && exit
-	sudo cp -rf /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
+	cp -rf /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
 #echo "reboot"
 fi
 #else
 #echo "this is not raspberrypi kernel, no need to update touch configure, reboot"
 #fi
 
-sudo sync
-sudo sync
+sync
+sync
 sleep 1
 if [ $# -eq 1 ]; then
-sudo ./rotate.sh $1
+./rotate.sh $1
 elif [ $# -gt 1 ]; then
 echo "Too many parameters"
 fi
 
 echo "reboot now"
-sudo reboot
+reboot
