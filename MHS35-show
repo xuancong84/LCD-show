@@ -16,7 +16,7 @@ for opt in "fbcon=map:10" "fbcon=font:ProFont6x11" "logo.nologo"; do
 	if [ `grep "$opt" /boot/cmdline.txt | wc -c` != 0 ]; then
 		continue
 	fi
-	echo -n " $opt" >>/boot/cmdline.txt
+	sed -i "\${s/\$/ $opt/}" /boot/cmdline.txt
 done
 
 
@@ -29,17 +29,18 @@ for config in "hdmi_force_hotplug=1" "dtparam=i2c_arm=on" "dtparam=spi=on" "enab
 	"hdmi_group=2" "hdmi_mode=85" "hdmi_drive=2"; do
 	if [ `grep "^$config" /boot/config.txt | wc -l` != 0 ]; then
 		continue
-	fi
-	if [ `grep "^#\+$config" /boot/config.txt | wc -l` != 0 ]; then
+	elif [ `grep "^#\+$config" /boot/config.txt | wc -l` != 0 ]; then
 		sed -i "s/^#\+$config/$config/g" /boot/config.txt
+	else
+		echo "$config" >>/boot/config.txt
 	fi
 done
 if [ `grep "^dtoverlay=vc4-kms-v3d" /boot/config.txt | wc -c` != 0 ]; then
 	sed -i "s:^dtoverlay=vc4-kms-v3d:dtoverlay=vc4-fkms-v3d:g" /boot/config.txt
-elif [ `grep "^#dtoverlay=vc4-kms-v3d" /boot/config.txt | wc -c` != 0 ]; then
-	sed -i "s:^#dtoverlay=vc4-kms-v3d:dtoverlay=vc4-kms-v3d:g" /boot/config.txt
-else
-	echo "dtoverlay=vc4-kms-v3d" >>/boot/config.txt
+elif [ `grep "^#dtoverlay=vc4-fkms-v3d" /boot/config.txt | wc -c` != 0 ]; then
+	sed -i "s:^#dtoverlay=vc4-fkms-v3d:dtoverlay=vc4-fkms-v3d:g" /boot/config.txt
+elif [ `grep "^dtoverlay=vc4-fkms-v3d" /boot/config.txt | wc -c` == 0 ]; then
+	echo "dtoverlay=vc4-fkms-v3d" >>/boot/config.txt
 fi
 
 

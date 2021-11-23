@@ -4,6 +4,7 @@ Enhancements:
 2. It does not make stupid assumptions on your /boot/config.txt and /boot/cmdline.txt, as well as whether your OS is 32-bit or 64-bit
 3. It is much smaller in size because it does not contain hard-copied .deb files, of which most are outdated
 4. It tries to go to highest resolution right away as low resolution is hardly useful
+5. In /boot folder, there will be (cmdline/config).(hdmi/gpio).txt, to switch between HDMI and GPIO display, copy the corresponding file to (config/cmdline).txt
 
 ### Install drivers in the Ubuntu system
 https://github.com/lcdwiki/LCD-show-ubuntu
